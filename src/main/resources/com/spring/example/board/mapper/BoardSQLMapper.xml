@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.example.board.mapper.BoardSQLMapper">
+	
+	<insert id="insertBoard">
+		INSERT INTO EXAMPLE_BOARD VALUES(
+			Example_Board_seq.nextval,
+			#{user_no},
+			#{board_title},			
+			#{board_content},
+			0,
+			#{board_secret},			
+			SYSDATE,
+			SYSDATE,
+			SYSDATE
+		)
+	</insert>
+	
+	<select id="getBoardByTitle" resultType="com.spring.example.vo.BoardVo">
+		SELECT t2.* FROM (
+			SELECT t1.* , ROWNUM AS rnum FROM (SELECT fb.* FROM EXAMPLE_BOARD fb , EXAMPLE_USER fm 
+				WHERE fb.user_no = fm.user_no AND board_title LIKE '%' || #{title} || '%' ORDER BY board_no DESC
+				) t1
+			) t2
+	</select>
+	
+	<select id="getBoardByContent" resultType="com.spring.example.vo.BoardVo">
+		SELECT fb.* FROM EXAMPLE_BOARD fb , EXAMPLE_USER fm 
+				WHERE fb.user_no = fm.user_no AND fb.board_content LIKE '%' || #{content} || '%' ORDER BY board_no DESC	
+	</select>
+	
+	<select id="getBoardByNickName" resultType="com.spring.example.vo.BoardVo">
+		SELECT fb.* FROM EXAMPLE_BOARD fb , EXAMPLE_USER fm 
+				WHERE fb.user_no = fm.user_no AND fm.user_nickname LIKE '%' || #{nickname} || '%'
+	</select>
+	
+	<select id="getBoardList" resultType="com.spring.example.vo.BoardVo">
+		SELECT * FROM EXAMPLE_BOARD ORDER BY board_writedate DESC
+	</select>
+	
+	<select id="getBoardByNo" resultType="com.spring.example.vo.BoardVo">
+		SELECT * 
+		FROM EXAMPLE_BOARD
+		WHERE board_no = #{no}		
+	</select>
+	
+	<update id="increaseReadCount">
+		UPDATE EXAMPLE_BOARD 
+		SET board_readcount = board_readcount + 1 , board_readcount_writedate = SYSDATE
+		WHERE board_no = #{no}			
+	</update>	
+		
+	<delete id="deleteBoard">
+		DELETE FROM EXAMPLE_BOARD WHERE board_no = #{board_no}
+	</delete>
+	
+	<update id="updateBoard">
+		UPDATE EXAMPLE_BOARD SET board_title = #{board_title} , board_content = #{board_content} , board_updatewrite_date = SYSDATE
+		WHERE board_no = #{board_no}
+	</update>		
+</mapper>
